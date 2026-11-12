@@ -1,0 +1,48 @@
+
+[
+  {
+    "id": "drug-001",
+    "name": "NovaCure",
+    "status": "In Development",
+    "description": "An illustrative drug candidate being evaluated for a fictional inflammatory condition.",
+    "mechanismOfAction": "Illustrative selective inhibition of a fictional inflammatory signaling pathway.",
+    "sideEffects": [
+      "Mild headache",
+      "Nausea",
+      "Fatigue"
+    ]
+  },
+  {
+    "id": "drug-002",
+    "name": "CardioZen",
+    "status": "Clinical Trial",
+    "description": "An illustrative candidate under clinical evaluation for a fictional cardiovascular condition.",
+    "mechanismOfAction": "Illustrative modulation of a fictional cardiovascular receptor.",
+    "sideEffects": [
+      "Dizziness",
+      "Nausea"
+    ]
+  },
+  {
+    "id": "drug-003",
+    "name": "Immunexa",
+    "status": "Approved",
+    "description": "An illustrative approved candidate for a fictional immune-related condition.",
+    "mechanismOfAction": "Illustrative modulation of a fictional immune response pathway.",
+    "sideEffects": [
+      "Fatigue",
+      "Mild skin irritation"
+    ]
+  },
+  {
+    "id": "drug-004",
+    "name": "NeuroVale",
+    "status": "In Development",
+    "description": "An illustrative candidate being researched for a fictional neurological condition.",
+    "mechanismOfAction": "Illustrative interaction with a fictional neural signaling target.",
+    "sideEffects": [
+      "Drowsiness",
+      "Headache"
+    ]
+  }
+]
