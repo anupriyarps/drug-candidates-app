@@ -1,205 +1,241 @@
 # Drug Candidate Portal
 
-A responsive web application built as part of the **Senior Frontend Engineer coding challenge for Merck KGaA – Healthcare Digital, Data & IT R&D**.
+A full-stack web application developed as part of the **Senior Frontend Engineer Coding Challenge – Merck KGaA, Healthcare Digital, Data & IT R&D**.
 
-The application provides a simple interface to explore pharmaceutical research candidates, view their development status, search by candidate name, filter by status, and access detailed scientific information.
-
-## Overview
-
-The Drug Candidate Portal demonstrates frontend engineering practices using Next.js, React, TypeScript, and Tailwind CSS. It includes a mock REST API, reusable UI components, server-side data access, automated tests, and responsive layouts.
-
-The application uses illustrative fictional data and is intended only for demonstration purposes.
+The application provides a searchable, filterable, and paginated interface for exploring fictional drug candidates. It demonstrates modern frontend engineering practices, API integration, reusable components, data access abstraction, caching, error handling, automated testing, and scalability considerations.
 
 ## Features
 
-- **Candidate Listing:** Displays drug candidates with their name, development status, and description.
-- **Search:** Search candidates by name.
-- **Status Filtering:** Filter candidates by In Development, Clinical Trial, or Approved status.
-- **Combined Filtering:** Apply name search and status filtering together.
-- **Candidate Details:** View detailed candidate information, including mechanism of action and potential side effects.
-- **Mock REST API:** Uses JSON-based data with Next.js API routes.
-- **Debounced Search:** Uses a 300 ms debounce to avoid unnecessary API requests while typing.
-- **Request Cancellation:** Uses AbortController to cancel outdated search requests.
-- **Loading and Error States:** Provides feedback during requests and when errors occur.
-- **Responsive UI:** Supports desktop, tablet, and mobile layouts.
-- **Accessibility:** Includes semantic HTML, labelled form controls, and visible keyboard focus indicators.
+### Candidate Management
+- Browse drug candidates with their name, development status, and description.
+- View detailed candidate information, including mechanism of action and side effects.
+- Search candidates by name.
+- Filter candidates by development status.
+- Sort candidates by name or status.
+- Navigate through paginated results.
+
+### Frontend Experience
+- Responsive UI built with Tailwind CSS.
+- Reusable React components.
+- Server-rendered initial candidate data.
+- Client-side search and filtering.
+- Search, status, pagination, and sorting state preserved in URL query parameters.
+- Debounced search requests.
+- Request cancellation using `AbortController`.
+- Loading, error, and empty states.
+- Accessible form labels and keyboard focus indicators.
+
+### Backend and API
+- Next.js API Route Handlers.
+- TypeScript-based API contracts.
+- JSON-backed mock data repository.
+- Input validation and structured API responses.
+- Candidate detail endpoint.
+- Server-side filtering, sorting, and pagination.
+
+### Performance and Scalability
+- Server-side pagination to limit response payloads.
+- Upstash Redis caching.
+- Cache keys based on dataset and query parameters.
+- Configurable cache expiration (60 seconds).
+- Graceful fallback to the JSON repository when Redis is unavailable.
+- Optional synthetic dataset containing 100,000 records for scalability testing.
+
+### Testing
+- Jest.
+- React Testing Library.
+- API route tests.
+- Component tests.
+- Service-layer tests.
 
 ## Technology Stack
 
-| Technology | Purpose |
+| Area | Technology |
 |---|---|
-| Next.js 16 | React framework and application routing |
-| React 19 | Component-based UI development |
-| TypeScript | Static typing and maintainability |
-| Tailwind CSS 4 | Responsive styling |
-| Jest | Unit and integration testing |
-| React Testing Library | Component testing |
-| ESLint | Code quality and linting |
+| Framework | Next.js 16 |
+| UI | React 19 |
+| Language | TypeScript |
+| Styling | Tailwind CSS 4 |
+| API | Next.js Route Handlers |
+| Data source | JSON |
+| Caching | Upstash Redis |
+| Testing | Jest, React Testing Library |
+| Code quality | ESLint |
 
-## Project Structure
+## Architecture
+
+The application follows a layered architecture that separates presentation, API handling, application services, data access, and caching.
 
 ```text
-drug-candidates-app/
-│
-├── src/
-│   ├── app/
-│   │   ├── api/
-│   │   │   └── candidates/
-│   │   │       ├── [id]/
-│   │   │       │   └── route.ts
-│   │   │       └── route.ts
-│   │   │
-│   │   ├── candidates/
-│   │   │   └── [id]/
-│   │   │       └── page.tsx
-│   │   │
-│   │   ├── error.tsx
-│   │   ├── loading.tsx
-│   │   ├── not-found.tsx
-│   │   ├── globals.css
-│   │   ├── layout.tsx
-│   │   └── page.tsx
-│   │
-│   ├── components/
-│   │   ├── CandidateCard.tsx
-│   │   └── CandidateList.tsx
-│   │
-│   ├── data/
-│   │   └── candidates.json
-│   │
-│   ├── services/
-│   │   ├── candidateApiClient.ts
-│   │   └── candidateDataService.ts
-│   │
-│   └── types/
-│       └── candidate.ts
-│
-├── tests/
+src/
+├── app/
 │   ├── api/
-│   │   ├── candidates.test.ts
-│   │   └── candidateById.test.ts
-│   │
-│   ├── components/
-│   │   ├── CandidateCard.test.tsx
-│   │   └── CandidateList.test.tsx
-│   │
-│   └── services/
-│       └── candidateDataService.test.ts
+│   │   ├── candidates/
+│   │   │   ├── route.ts
+│   │   │   └── [id]/route.ts
+│   │   └── health/
+│   │       └── redis/route.ts
+│   ├── candidates/
+│   │   └── [id]/page.tsx
+│   ├── layout.tsx
+│   ├── page.tsx
+│   └── globals.css
 │
-├── jest.config.ts
-├── jest.setup.ts
-├── next.config.ts
-├── package.json
-├── tsconfig.json
-└── README.md
+├── components/
+│   ├── CandidateCard.tsx
+│   └── CandidateList.tsx
+│
+├── data/
+│   └── candidates.json
+│
+├── lib/
+│   ├── candidateSearchParams.ts
+│   ├── cache/
+│   │   └── candidateCache.ts
+│   └── redis.ts
+│
+├── repositories/
+│   ├── interfaces/
+│   │   └── ICandidateRepository.ts
+│   ├── implementations/
+│   │   └── JsonCandidateRepository.ts
+│   └── candidateRepositoryFactory.ts
+│
+├── services/
+│   ├── candidateDataService.ts
+│   └── candidateApiClient.ts
+│
+└── types/
+    └── candidate.ts
+
+tests/
+├── api/
+├── components/
+├── lib/
+├── repositories/
+└── services/
+
+scripts/
+└── generate-candidates.mjs
+
+docs/
+└── PERFORMANCE.md
 ```
-
-## Application Architecture
-
-The application separates UI components, API routes, data access, and type definitions.
-
-### 1. Presentation Layer
-
-- `CandidateList.tsx`: Manages search, status filtering, loading, error, and empty states.
-- `CandidateCard.tsx`: Displays an individual candidate and links to its details page.
-- App pages: Render the candidate listing and candidate details.
-
-### 2. API Layer
-
-Next.js Route Handlers expose REST-style endpoints.
-
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/api/candidates` | Retrieve candidates, with optional search and status filters |
-| GET | `/api/candidates/[id]` | Retrieve a candidate by ID |
-
-### 3. Service Layer
-
-- `candidateApiClient.ts`: Handles client-side API communication and request cancellation.
-- `candidateDataService.ts`: Provides server-side data access and filtering from the JSON dataset.
-
-### 4. Data Layer
-
-`candidates.json` contains four fictional drug candidate records used by the application.
 
 ### Request Flow
 
 ```text
-User Interaction
-      |
-      v
-CandidateList Component
-      |
-      v
-Debounce (300 ms)
-      |
-      v
-Candidate API Client
-      |
-      v
-Next.js API Route
-      |
-      v
+Browser
+   |
+   v
+Next.js Pages / React Components
+   |
+   v
+Next.js API Routes
+   |
+   v
 Candidate Data Service
-      |
-      v
-JSON Data Source
-      |
-      v
-Filtered Candidate Response
-      |
-      v
-Updated UI
+   |
+   +------> Redis Cache
+   |           |
+   |       Cache Hit
+   |           |
+   |       Return Result
+   |
+   +------> Candidate Repository
+                  |
+                  v
+             JSON Dataset
 ```
 
-## Performance Considerations
+On a cache miss, the service retrieves the data through the repository and attempts to store the result in Redis. If Redis is unavailable, the repository remains the source of data.
 
-The implementation includes the following performance considerations:
+## Architecture Decisions
 
-- Debounced search reduces unnecessary API calls while users type.
-- AbortController cancels outdated requests when search criteria change.
-- Search and status filtering are performed through the API rather than directly against the UI list.
-- Server-side data access is separated from client-side API communication.
-- Reusable components help maintain a consistent UI and reduce duplication.
-- The candidate listing uses a responsive grid layout.
+### 1. Repository Pattern
 
-**Scalability consideration:** The current implementation uses a small in-memory JSON dataset. For production-scale datasets, the data service can be extended to use a database-backed repository with server-side pagination, indexed filtering, and sorting without changing the overall UI/API separation.
+The `ICandidateRepository` interface separates data access from application services.
 
-## Error Handling
+The current implementation uses `JsonCandidateRepository` to retrieve candidate information from JSON files.
 
-The application handles common scenarios:
+This abstraction allows the underlying data source to be replaced with a database-backed repository without coupling the application services or UI to a specific storage implementation.
 
-- Invalid status filter values return a `400` response.
-- Missing candidate records return a `404` response.
-- Unexpected API errors return a safe `500` response.
-- Client-side request failures display an error message.
-- Loading and empty states provide feedback during candidate searches.
-- Next.js error and not-found boundaries handle application-level errors and missing pages.
+### 2. Service Layer
 
-## Testing
+`candidateDataService` coordinates candidate retrieval and caching.
 
-The application uses Jest and React Testing Library.
+Its responsibilities include:
+- Normalizing search and pagination parameters.
+- Checking Redis for cached results.
+- Retrieving data through the repository on a cache miss.
+- Storing retrieved results in Redis.
+- Falling back to the repository when Redis operations fail.
 
-The test suite covers:
+### 3. Redis Caching
 
-- Candidate card rendering and navigation.
-- Candidate listing, search, and status filtering.
-- Combined search and status filtering.
-- Loading, empty, and error states.
-- Candidate data service filtering and lookup.
-- Candidate collection API behavior.
-- Candidate-by-ID API behavior.
+Upstash Redis is used to cache candidate lists and candidate details.
 
-### Test Results
+Cache keys include relevant parameters:
+- Dataset.
+- Search term.
+- Development status.
+- Page and page size.
+- Sort field and sort order.
 
-**Latest verified test run: 29 tests passing across 5 test suites.**
+The default cache expiration is 60 seconds.
 
-| Coverage Metric | Result |
-|---|---:|
-| Statements | 98.79% |
-| Branches | 97.22% |
-| Functions | 100% |
-| Lines | 100% |
+Redis is treated as a performance optimization rather than a dependency for data availability. If Redis becomes unavailable, the application continues retrieving data from the JSON repository.
+
+### 4. Server-Side Pagination
+
+Pagination is performed on the server.
+
+The API returns only the requested page instead of sending the complete dataset to the browser.
+
+The response includes:
+- Current page.
+- Page size.
+- Total records.
+- Total pages.
+- Next-page availability.
+- Previous-page availability.
+
+## API Endpoints
+
+### Get Candidates
+
+`GET /api/candidates`
+
+Supported query parameters:
+
+| Parameter | Description | Default |
+|---|---|---|
+| `search` | Search by candidate name | None |
+| `status` | Filter by candidate status | None |
+| `page` | Page number | 1 |
+| `pageSize` | Records per page | 20 |
+| `sortBy` | `name` or `status` | `name` |
+| `sortOrder` | `asc` or `desc` | `asc` |
+
+Maximum supported page size: 100.
+
+Example:
+
+```http
+GET /api/candidates?page=1&pageSize=20&sortBy=name&sortOrder=asc
+```
+
+### Get Candidate by ID
+
+`GET /api/candidates/{id}`
+
+Returns the details of a candidate matching the supplied ID.
+
+### Redis Health Check
+
+`GET /api/health/redis`
+
+Checks connectivity to the configured Redis instance.
 
 ## Getting Started
 
@@ -207,71 +243,136 @@ The test suite covers:
 
 - Node.js
 - npm
+- Upstash Redis account (optional; the application supports repository fallback when Redis is unavailable).
 
-### 1. Clone the repository
+### Installation
+
+Clone the repository:
 
 ```bash
 git clone https://github.com/anupriyarps/drug-candidates-app.git
-```
 
-### 2. Navigate to the project
-
-```bash
 cd drug-candidates-app
 ```
 
-### 3. Install dependencies
+Install dependencies:
 
 ```bash
 npm install
 ```
 
-### 4. Start the development server
+### Environment Configuration
+
+Create a `.env.local` file in the project root:
+
+```env
+UPSTASH_REDIS_REST_URL=your_upstash_rest_url
+UPSTASH_REDIS_REST_TOKEN=your_upstash_rest_token
+
+# Use small for the default demonstration dataset.
+CANDIDATE_DATASET=small
+```
+
+Do not commit `.env.local` or actual credentials to source control.
+
+### Run the Application
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000).
 
-## Available Scripts
+## Large Dataset Testing
 
-| Command | Description |
-|---|---|
-| `npm run dev` | Start the development server |
-| `npm run build` | Create an optimized production build |
-| `npm run start` | Start the production server |
-| `npm run lint` | Run ESLint |
-| `npm test -- --runInBand` | Run all tests |
-| `npm run test:coverage` | Run tests and generate coverage report |
+The application supports an optional synthetic dataset containing 100,000 fictional records.
 
-## Production Verification
+Generate the dataset locally:
 
-The following checks have been successfully completed:
+```bash
+node scripts/generate-candidates.mjs
+```
 
-- ESLint validation.
-- TypeScript validation during production build.
-- Optimized Next.js production build.
-- Automated test suite: 29 passing tests.
-- Responsive UI checks on desktop, tablet, and mobile.
-- Keyboard accessibility checks.
+Select the large dataset in `.env.local`:
 
-## Future Enhancements
+```env
+CANDIDATE_DATASET=large
+```
 
-Potential extensions for a production implementation include:
+Restart the application and access:
 
-- Database-backed candidate storage.
-- Server-side pagination and sorting.
-- Advanced scientific search.
-- Authentication and role-based access control.
-- Integration with real pharmaceutical research data sources.
+```http
+GET /api/candidates?page=1&pageSize=20
+```
 
-These enhancements are outside the scope of the current coding challenge.
+Expected pagination metadata:
 
-## Disclaimer
+| Metric | Expected value |
+|---|---:|
+| Total records | 100,000 |
+| Page size | 20 |
+| Total pages | 5,000 |
+| Returned records | 20 |
 
-All candidate names, descriptions, mechanisms of action, and side-effect information in this application are fictional and provided solely for demonstration purposes. They do not represent actual medicines, clinical research, or medical advice.
+To return to the standard demonstration dataset:
 
----
+```env
+CANDIDATE_DATASET=small
+```
 
-**Developed as part of the Merck KGaA Senior Frontend Engineer Coding Challenge.**
+Restart the application after changing the environment variable.
+
+The generated large dataset is intended for local scalability testing and does not need to be committed to the repository.
+
+## Testing and Code Quality
+
+Run the automated test suite:
+
+```bash
+npm test -- --runInBand
+```
+
+Run ESLint:
+
+```bash
+npm run lint
+```
+
+Run TypeScript validation:
+
+```bash
+npx tsc --noEmit
+```
+
+Create a production build:
+
+```bash
+npm run build
+```
+
+## Performance Considerations and Trade-offs
+
+The application demonstrates pagination, caching, and graceful degradation using a synthetic dataset.
+
+The current JSON repository loads the selected dataset into server memory. Filtering and sorting are performed in application memory before the requested page is returned.
+
+Redis reduces repeated processing for identical cached requests.
+
+For a production system with larger or frequently changing datasets, a database-backed repository would be preferable, with:
+- Database-level filtering and sorting.
+- Appropriate indexes.
+- Database-level pagination.
+- Query optimization.
+- Cache invalidation when data changes.
+
+The current implementation demonstrates the architectural separation needed to introduce these capabilities without coupling the UI to the data source.
+
+See [docs/PERFORMANCE.md](docs/PERFORMANCE.md) for the scalability testing approach, cache validation, and performance benchmark methodology.
+
+## Data Disclaimer
+
+All candidate names, mechanisms of action, descriptions, and side effects in this project are fictional and intended solely for demonstration purposes. They do not represent real medicines or medical advice.
+
+## Author
+
+Developed as part of the Merck KGaA Senior Frontend Engineer coding challenge.

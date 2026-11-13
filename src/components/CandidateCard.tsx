@@ -4,6 +4,7 @@ import type { DrugCandidate } from "@/types/candidate";
 
 interface CandidateCardProps {
   candidate: DrugCandidate;
+  detailsHref?: string;
 }
 
 const statusStyles = {
@@ -14,6 +15,7 @@ const statusStyles = {
 
 export default function CandidateCard({
   candidate,
+  detailsHref,
 }: CandidateCardProps) {
   return (
     <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
@@ -34,7 +36,7 @@ export default function CandidateCard({
       </p>
 
       <Link
-        href={`/candidates/${candidate.id}`}
+        href={detailsHref ?? `/candidates/${candidate.id}`}
         className="inline-flex items-center text-sm font-semibold text-blue-700 hover:text-blue-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-700"
       >
         View details

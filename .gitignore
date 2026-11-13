@@ -41,3 +41,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+
+# Generated large test dataset
+/src/data/candidates.large.json
+
+# Python / temporary files
+__pycache__/
+*.pyc

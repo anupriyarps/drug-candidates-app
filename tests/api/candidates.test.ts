@@ -15,22 +15,34 @@ jest.mock("../../src/services/candidateDataService", () => ({
 const mockGetCandidates =
   getCandidates as jest.MockedFunction<typeof getCandidates>;
 
+const mockCandidate = {
+  id: "drug-001",
+  name: "NovaCure",
+  status: "In Development" as const,
+  description: "Targeted treatment candidate.",
+  mechanismOfAction: "Blocks a signaling pathway.",
+  sideEffects: ["Headache"],
+};
+
+const mockResult = {
+  data: [mockCandidate],
+  pagination: {
+    page: 1,
+    pageSize: 20,
+    totalRecords: 1,
+    totalPages: 1,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  },
+};
+
 describe("GET /api/candidates", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it("should return all candidates successfully", async () => {
-    mockGetCandidates.mockResolvedValue([
-      {
-        id: "drug-001",
-        name: "NovaCure",
-        status: "In Development",
-        description: "Targeted treatment candidate.",
-        mechanismOfAction: "Blocks a signaling pathway.",
-        sideEffects: ["Headache"],
-      },
-    ]);
+    mockGetCandidates.mockResolvedValue(mockResult);
 
     const request = new NextRequest(
       "http://localhost:3000/api/candidates",
@@ -40,12 +52,24 @@ describe("GET /api/candidates", () => {
     const body = await response.json();
 
     expect(response.status).toBe(200);
-    expect(body.total).toBe(1);
+    expect(body.pagination.totalRecords).toBe(1);
     expect(body.data[0].name).toBe("NovaCure");
+    expect(mockGetCandidates).toHaveBeenCalledWith({
+      search: undefined,
+      status: undefined,
+      page: 1,
+      pageSize: 20,
+      sortBy: "name",
+      sortOrder: "asc",
+    });
   });
 
   it("should pass the search parameter to the service", async () => {
-    mockGetCandidates.mockResolvedValue([]);
+    mockGetCandidates.mockResolvedValue({
+      ...mockResult,
+      data: [],
+      pagination: { ...mockResult.pagination, totalRecords: 0, totalPages: 0 },
+    });
 
     const request = new NextRequest(
       "http://localhost:3000/api/candidates?search=NovaCure",
@@ -56,6 +80,10 @@ describe("GET /api/candidates", () => {
     expect(mockGetCandidates).toHaveBeenCalledWith({
       search: "NovaCure",
       status: undefined,
+      page: 1,
+      pageSize: 20,
+      sortBy: "name",
+      sortOrder: "asc",
     });
   });
 
@@ -69,6 +97,26 @@ describe("GET /api/candidates", () => {
 
     expect(response.status).toBe(400);
     expect(body.error).toBe("Invalid candidate status.");
+    expect(mockGetCandidates).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["page=invalid", "Page and pageSize must be positive integers."],
+    ["page=0", "Page and pageSize must be positive integers."],
+    ["page=9007199254740992", "Page and pageSize must be positive integers."],
+    ["pageSize=101", "pageSize cannot exceed 100."],
+    ["sortBy=unknown", "Invalid sort field."],
+    ["sortOrder=sideways", "Invalid sort order."],
+  ])("should reject invalid query parameter %s", async (query, error) => {
+    const request = new NextRequest(
+      `http://localhost:3000/api/candidates?${query}`,
+    );
+
+    const response = await GET(request);
+    const body = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(body.error).toBe(error);
     expect(mockGetCandidates).not.toHaveBeenCalled();
   });
 

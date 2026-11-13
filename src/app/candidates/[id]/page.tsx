@@ -2,10 +2,17 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import {
+  getCandidateListHref,
+  parseCandidateSearchParams,
+} from "@/lib/candidateSearchParams";
 import { getCandidateById } from "@/services/candidateDataService";
 
 interface CandidateDetailsPageProps {
   params: Promise<{ id: string }>;
+  searchParams: Promise<
+    Record<string, string | string[] | undefined>
+  >;
 }
 
 export async function generateMetadata({
@@ -28,8 +35,15 @@ const statusStyles = {
 
 export default async function CandidateDetailsPage({
   params,
+  searchParams,
 }: CandidateDetailsPageProps) {
-  const { id } = await params;
+  const [{ id }, rawSearchParams] = await Promise.all([
+    params,
+    searchParams,
+  ]);
+  const listHref = getCandidateListHref(
+    parseCandidateSearchParams(rawSearchParams),
+  );
   const candidate = await getCandidateById(id);
 
   if (!candidate) {
@@ -57,7 +71,7 @@ export default async function CandidateDetailsPage({
 
       <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8 lg:py-14">
         <Link
-          href="/"
+          href={listHref}
           className="inline-flex items-center gap-2 text-sm font-semibold text-[#2563a6] hover:text-[#102a43] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-700"
         >
           <span aria-hidden="true">←</span>

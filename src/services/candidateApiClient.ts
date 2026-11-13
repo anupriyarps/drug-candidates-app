@@ -1,31 +1,18 @@
 
+import { serializeCandidateSearchParams } from "@/lib/candidateSearchParams";
 import type {
-  CandidateStatus,
-  DrugCandidate,
+  CandidateApiResponse,
+  CandidateSearchParams,
+  PaginatedCandidates,
 } from "@/types/candidate";
 
-interface CandidatesResponse {
-  data: DrugCandidate[];
-  total: number;
-}
-
 export async function searchCandidates(
-  search: string,
-  status?: CandidateStatus,
+  searchParams: CandidateSearchParams,
   signal?: AbortSignal,
-): Promise<DrugCandidate[]> {
-  const params = new URLSearchParams();
-
-  if (search.trim()) {
-    params.set("search", search.trim());
-  }
-
-  if (status) {
-    params.set("status", status);
-  }
-
+): Promise<PaginatedCandidates> {
+  const query = serializeCandidateSearchParams(searchParams);
   const response = await fetch(
-    `/api/candidates?${params.toString()}`,
+    `/api/candidates?${query}`,
     {
       method: "GET",
       signal,
@@ -36,7 +23,7 @@ export async function searchCandidates(
     throw new Error("Unable to search drug candidates.");
   }
 
-  const result: CandidatesResponse = await response.json();
+  const result: CandidateApiResponse = await response.json();
 
-  return result.data;
+  return result;
 }
