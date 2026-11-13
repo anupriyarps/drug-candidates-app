@@ -14,23 +14,22 @@ export async function generateMetadata({
   const { id } = await params;
   const candidate = await getCandidateById(id);
 
-  if (!candidate) {
-    return {
-      title: "Candidate Not Found",
-    };
-  }
-
   return {
-    title: candidate.name,
-    description: candidate.description,
+    title: candidate?.name ?? "Candidate Not Found",
+    description: candidate?.description,
   };
 }
+
+const statusStyles = {
+  "In Development": "bg-blue-50 text-blue-800 ring-blue-200",
+  "Clinical Trial": "bg-amber-50 text-amber-800 ring-amber-200",
+  Approved: "bg-emerald-50 text-emerald-800 ring-emerald-200",
+};
 
 export default async function CandidateDetailsPage({
   params,
 }: CandidateDetailsPageProps) {
   const { id } = await params;
-
   const candidate = await getCandidateById(id);
 
   if (!candidate) {
@@ -38,60 +37,124 @@ export default async function CandidateDetailsPage({
   }
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-[#f4f7fb]">
       <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto max-w-4xl px-6 py-6">
-          <Link
-            href="/"
-            className="text-sm font-medium text-blue-700 hover:text-blue-900"
-          >
-            ← Back to candidates
-          </Link>
+        <div className="mx-auto flex max-w-7xl items-center gap-3 px-5 py-4 sm:px-8">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#163a5f] text-lg font-bold text-white">
+            D
+          </div>
+
+          <div>
+            <p className="font-bold text-[#163a5f]">
+              Drug Candidate Portal
+            </p>
+            <p className="text-xs text-slate-500">
+              Pharmaceutical Research Platform
+            </p>
+          </div>
         </div>
       </header>
 
-      <div className="mx-auto max-w-4xl px-6 py-10">
-        <article className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
-          <div className="mb-4">
-            <span className="rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">
-              {candidate.status}
-            </span>
+      <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8 lg:py-14">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-[#2563a6] hover:text-[#102a43] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-700"
+        >
+          <span aria-hidden="true">←</span>
+          Back to candidates
+        </Link>
+
+        <section className="mt-8 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+          <div className="border-b border-slate-200 bg-[#f8fafc] px-6 py-8 sm:px-9">
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#3178b9]">
+              Research Candidate Profile
+            </p>
+
+            <div className="mt-4 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+              <div>
+                <h1 className="text-3xl font-bold tracking-tight text-[#102a43] sm:text-4xl">
+                  {candidate.name}
+                </h1>
+
+                <p className="mt-3 text-sm text-slate-600">
+                  {candidate.description}
+                </p>
+              </div>
+
+              <span
+                className={`inline-flex w-fit shrink-0 rounded-full px-4 py-2 text-xs font-semibold ring-1 ring-inset ${statusStyles[candidate.status]}`}
+              >
+                {candidate.status}
+              </span>
+            </div>
           </div>
 
-          <h1 className="text-3xl font-bold text-slate-900">
-            {candidate.name}
-          </h1>
+          <div className="grid gap-8 p-6 sm:p-9 lg:grid-cols-2">
+            <section>
+              <div className="mb-4 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-[#2563a6]">
+                  <span aria-hidden="true">01</span>
+                </div>
 
-          <p className="mt-4 leading-7 text-slate-600">
-            {candidate.description}
-          </p>
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
+                    Scientific information
+                  </p>
+                  <h2 className="text-lg font-bold text-[#163a5f]">
+                    Mechanism of Action
+                  </h2>
+                </div>
+              </div>
 
-          <section className="mt-8 border-t border-slate-200 pt-6">
-            <h2 className="text-lg font-semibold text-slate-900">
-              Mechanism of Action
-            </h2>
+              <div className="rounded-lg border border-slate-200 bg-slate-50 p-5">
+                <p className="text-sm leading-7 text-slate-600">
+                  {candidate.mechanismOfAction}
+                </p>
+              </div>
+            </section>
 
-            <p className="mt-3 leading-7 text-slate-600">
-              {candidate.mechanismOfAction}
+            <section>
+              <div className="mb-4 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50 text-amber-700">
+                  <span aria-hidden="true">02</span>
+                </div>
+
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
+                    Safety information
+                  </p>
+                  <h2 className="text-lg font-bold text-[#163a5f]">
+                    Potential Side Effects
+                  </h2>
+                </div>
+              </div>
+
+              <div className="rounded-lg border border-slate-200 bg-slate-50 p-5">
+                <ul className="space-y-3">
+                  {candidate.sideEffects.map((effect) => (
+                    <li
+                      key={effect}
+                      className="flex items-start gap-3 text-sm text-slate-600"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="mt-1 h-2 w-2 shrink-0 rounded-full bg-amber-500"
+                      />
+                      {effect}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+          </div>
+
+          <div className="border-t border-slate-200 px-6 py-4 sm:px-9">
+            <p className="text-xs leading-5 text-slate-500">
+              Illustrative demonstration data only. Not intended
+              for clinical or medical decision-making.
             </p>
-          </section>
-
-          <section className="mt-8 border-t border-slate-200 pt-6">
-            <h2 className="text-lg font-semibold text-slate-900">
-              Potential Side Effects
-            </h2>
-
-            <ul className="mt-3 list-disc space-y-2 pl-5 text-slate-600">
-              {candidate.sideEffects.map((effect) => (
-                <li key={effect}>{effect}</li>
-              ))}
-            </ul>
-          </section>
-
-          <p className="mt-8 border-t border-slate-200 pt-4 text-xs text-slate-500">
-            Illustrative demonstration data only.
-          </p>
-        </article>
+          </div>
+        </section>
       </div>
     </main>
   );

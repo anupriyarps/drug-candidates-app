@@ -2,7 +2,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { DrugCandidate } from "@/types/candidate";
+import type {
+  CandidateStatus,
+  DrugCandidate,
+} from "@/types/candidate";
 import { searchCandidates } from "@/services/candidateApiClient";
 import CandidateCard from "./CandidateCard";
 
@@ -10,12 +13,22 @@ interface CandidateListProps {
   initialCandidates: DrugCandidate[];
 }
 
+const STATUS_OPTIONS: {
+  label: string;
+  value: CandidateStatus | "";
+}[] = [
+  { label: "All statuses", value: "" },
+  { label: "In Development", value: "In Development" },
+  { label: "Clinical Trial", value: "Clinical Trial" },
+  { label: "Approved", value: "Approved" },
+];
+
 export default function CandidateList({
   initialCandidates,
 }: CandidateListProps) {
   const [search, setSearch] = useState("");
-  const [candidates, setCandidates] =
-    useState(initialCandidates);
+  const [status, setStatus] = useState<CandidateStatus | "">("");
+  const [candidates, setCandidates] = useState(initialCandidates);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,7 +36,7 @@ export default function CandidateList({
     const controller = new AbortController();
 
     const timer = setTimeout(async () => {
-      if (!search.trim()) {
+      if (!search.trim() && !status) {
         setCandidates(initialCandidates);
         setError(null);
         setIsLoading(false);
@@ -36,6 +49,7 @@ export default function CandidateList({
 
         const results = await searchCandidates(
           search,
+          status || undefined,
           controller.signal,
         );
 
@@ -57,34 +71,65 @@ export default function CandidateList({
       clearTimeout(timer);
       controller.abort();
     };
-  }, [search, initialCandidates]);
+  }, [search, status, initialCandidates]);
 
   return (
     <section aria-label="Drug candidates">
-      <div className="mb-8">
-        <label
-          htmlFor="candidate-search"
-          className="mb-2 block text-sm font-medium text-slate-700"
-        >
-          Search by candidate name
-        </label>
+      <div className="mb-8 grid gap-4 md:grid-cols-[1fr_260px]">
+        <div>
+          <label
+            htmlFor="candidate-search"
+            className="mb-2 block text-sm font-semibold text-[#163a5f]"
+          >
+            Search candidates
+          </label>
 
-        <input
-          id="candidate-search"
-          type="search"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          placeholder="Search drug candidates..."
-          className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
-        />
+          <input
+            id="candidate-search"
+            type="search"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Search by candidate name..."
+            className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="candidate-status"
+            className="mb-2 block text-sm font-semibold text-[#163a5f]"
+          >
+            Development status
+          </label>
+
+          <select
+            id="candidate-status"
+            value={status}
+            onChange={(event) =>
+              setStatus(event.target.value as CandidateStatus | "")
+            }
+            className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+          >
+            {STATUS_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-slate-900">
-          Drug candidates
-        </h2>
+      <div className="mb-5 flex items-center justify-between gap-3">
+        <div>
+          <h2 className="text-xl font-bold text-[#163a5f]">
+            Drug candidates
+          </h2>
+          <p className="mt-1 text-xs text-slate-500">
+            Browse and explore the research pipeline
+          </p>
+        </div>
 
-        <span className="text-sm text-slate-500">
+        <span className="rounded-full bg-white px-3 py-1.5 text-sm font-semibold text-slate-600 ring-1 ring-slate-200">
           {candidates.length} results
         </span>
       </div>
@@ -102,12 +147,12 @@ export default function CandidateList({
       )}
 
       {!error && !isLoading && candidates.length === 0 && (
-        <p className="rounded-lg border border-dashed border-slate-300 p-8 text-center text-slate-500">
-          No candidates found. Try another search.
+        <p className="rounded-lg border border-dashed border-slate-300 bg-white p-10 text-center text-slate-500">
+          No candidates found. Try changing your search or status filter.
         </p>
       )}
 
-      <div className="grid gap-5 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:gap-7">
         {candidates.map((candidate) => (
           <CandidateCard
             key={candidate.id}

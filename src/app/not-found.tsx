@@ -14,7 +14,7 @@ export default function NotFound() {
         </h1>
 
         <p className="mt-3 text-slate-600">
-          The requested drug candidate doesn't exist or is no longer available.
+          The requested drug candidate doesn&apos;t exist or is no longer available.
         </p>
 
         <Link
