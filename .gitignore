@@ -1,7 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -10,19 +10,22 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
+# testing and generated reports
+coverage/
+playwright-report/
+test-results/
 
 # next.js
-/.next/
-/out/
+.next/
+out/
 
 # production
-/build
+build/
 
 # misc
 .DS_Store
 *.pem
+.swc/
 
 # debug
 npm-debug.log*
@@ -44,8 +47,14 @@ next-env.d.ts
 
 
 # Generated large test dataset
-/src/data/candidates.large.json
+/backend/data/candidates.large.json
 
 # Python / temporary files
 __pycache__/
 *.pyc
+.venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+.coverage.*

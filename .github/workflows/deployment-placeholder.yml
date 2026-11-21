@@ -1,0 +1,17 @@
+name: Deployment Placeholder
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-before-future-deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Report deployment status
+        run: |
+          echo "No automatic deployment is configured."
+          echo "Add reviewed cloud-provider credentials and a deployment job only after production approval."
