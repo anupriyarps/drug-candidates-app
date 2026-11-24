@@ -1,10 +1,13 @@
 .venv
 __pycache__
+*.py[cod]
 .pytest_cache
-.ruff_cache
 .mypy_cache
-.coverage*
-data/candidates.large.json
+.ruff_cache
+.coverage
+htmlcov
+tests
 .env
 .env.*
 !.env.example
+.git

@@ -1,10 +1,12 @@
-.git
-.next
 node_modules
+.next
+.git
+.github
 coverage
 playwright-report
 test-results
-*.tsbuildinfo
-.swc
-.env*
+.env
+.env.*
 !.env.example
+npm-debug.log
+*.tsbuildinfo
